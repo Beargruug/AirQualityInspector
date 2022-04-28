@@ -50,7 +50,7 @@ export default function Home({ temp, hum, aq, token }) {
     intervalId.current = setInterval(() => {
       //assign interval to a variaable to clear it
       fetchData()
-    }, 30000)
+    }, 5000)
 
     return () => {
       clearInterval(intervalId.current)
