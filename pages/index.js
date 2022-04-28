@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useRef, useState, useEffect } from 'react'
 import { Grid, Paper } from '@mui/material'
 
 export default function Home({ temp, hum, aq, token }) {
@@ -45,17 +45,17 @@ export default function Home({ temp, hum, aq, token }) {
     return setData({ temp, hum, aq })
   }
 
-  let intervalId
+  let intervalId = useRef()
   useEffect(() => {
-    intervalId = setInterval(() => {
+    intervalId.current = setInterval(() => {
       //assign interval to a variaable to clear it
       fetchData()
     }, 30000)
 
     return () => {
-      clearInterval(intervalId)
+      clearInterval(intervalId.current)
     }
-  }, [])
+  })
 
   return (
     <Grid
