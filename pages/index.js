@@ -9,26 +9,26 @@ export default function Home({ temp, hum, aq, token }) {
   const backgroundColorForQuality = () => {
     let r, g, b
     let quality = data.aq.quality
+    let value;
 
-    if (quality > 80) {
-      // red FORCE signal pollution
+    if (quality > 100) {
+      // red high pollution
+      r = 255
+      g = Math.floor(255 * ((50 - (quality % 50)) - 50))
+      value = 'High Pollution'
+    } else if (quality < 68) {
+      // red to yellow low pollution
       r = 255
       g = Math.floor(255 * ((50 - (quality % 50)) / 50))
-    } else if (quality < 70 && quality > 50) {
-      // yellow to red high pollution
-      r = 255
-      g = Math.floor(255 * ((50 - (quality % 50)) / 50))
-    } else if (quality > 20 && quality < 70){
-      // green to yellow low pollution
-      r = Math.floor(255 * (quality / 50))
-      g = 255
+      value = 'Low Pollution'
     } else {
       // green
       r = Math.floor(255 * ((quality % 50) / 50))
       g = 255
+      value = 'Fresh Air'
     }
     b = 0
-    return `rgb(${r}, ${g}, ${b}, 0.5)`
+    return {color: `rgb(${r}, ${g}, ${b}, 0.5)`, value}
   }
 
   const fetchData = async () => {
@@ -62,6 +62,8 @@ export default function Home({ temp, hum, aq, token }) {
       clearInterval(intervalId.current)
     }
   })
+
+  const airQuality = backgroundColorForQuality()
 
   return (
     <Grid
@@ -108,10 +110,10 @@ export default function Home({ temp, hum, aq, token }) {
             alignItems: 'center',
             display: 'flex',
             flexWrap: 'wrap',
-            backgroundColor: backgroundColorForQuality()
+            backgroundColor: airQuality.color 
           }}
         >
-          <p style={{ fontSize: '75px' }}>{data.aq.quality} %</p>
+          <p style={{ fontSize: '45px' }}>{airQuality.value} </p>
         </Paper>
       </Grid>
       <Grid key={3} item>
