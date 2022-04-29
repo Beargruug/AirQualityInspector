@@ -10,18 +10,18 @@ export default function Home({ temp, hum, aq, token }) {
     let r, g, b
     let quality = data.aq.quality
 
-    if (quality > 70) {
+    if (quality > 55) {
       // green
       r = Math.floor(255 * ((quality % 50) / 50))
       g = 255
-    } else if (quality < 70) {
-      // green to yellow
-      r = Math.floor(255 * (quality / 50))
-      g = 255
-    } else {
+    } else if (quality < 30) {
       // yellow to red
       r = 255
       g = Math.floor(255 * ((50 - (quality % 50)) / 50))
+    } else {
+      // green to yellow
+      r = Math.floor(255 * (quality / 50))
+      g = 255
     }
     b = 0
     return `rgb(${r}, ${g}, ${b}, 0.5)`
