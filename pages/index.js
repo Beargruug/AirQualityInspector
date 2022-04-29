@@ -1,6 +1,8 @@
 import React, { useRef, useState, useEffect } from 'react'
 import { Grid, Paper } from '@mui/material'
 
+// TODO: add Error handling if wio is offline or data can't be fetched
+
 export default function Home({ temp, hum, aq, token }) {
   const [data, setData] = useState({ temp, hum, aq })
 
