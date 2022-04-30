@@ -1,20 +1,25 @@
 import React, { useRef, useState, useEffect } from 'react'
-import { Grid, Paper } from '@mui/material'
-
+import Image from 'next/image'
+import temperatureImg from '../images/temperatur.png'
+import humidityImg from '../images/humidity.png'
+import qualityImg from '../images/quality.png'
 // TODO: add Error handling if wio is offline or data can't be fetched
 
-export default function Home({ temp, hum, aq, token }) {
-  const [data, setData] = useState({ temp, hum, aq })
+export default function Home({
+  data: { quality, humidity, celsius_degree },
+  token
+}) {
+  const [data, setData] = useState({ quality, humidity, celsius_degree })
 
   const backgroundColorForQuality = () => {
     let r, g, b
-    let quality = data.aq.quality
-    let value;
+    let quality = data?.quality
+    let value
 
     if (quality > 100) {
       // red high pollution
       r = 255
-      g = Math.floor(255 * ((50 - (quality % 50)) - 50))
+      g = Math.floor(255 * (50 - (quality % 50) - 50))
       value = 'High Pollution'
     } else if (quality < 68) {
       // red to yellow low pollution
@@ -28,35 +33,41 @@ export default function Home({ temp, hum, aq, token }) {
       value = 'Fresh Air'
     }
     b = 0
-    return {color: `rgb(${r}, ${g}, ${b}, 0.5)`, value}
+
+    return { color: `rgb(${r}, ${g}, ${b}, 0.5)`, value }
   }
 
   const fetchData = async () => {
-    // Fetch data from external API
-    const temperature = await fetch(
-      `https://us.wio.seeed.io/v1/node/GroveTempHumD0/temperature?access_token=${token}`
-    )
-    const temp = await temperature.json()
+    const [tempRes, humidityRes, qualityRes] = await Promise.all([
+      fetch(
+        `https://us.wio.seeed.io/v1/node/GroveTempHumD0/temperature?access_token=${token}`
+      ),
+      fetch(
+        `https://us.wio.seeed.io/v1/node/GroveTempHumD0/humidity?access_token=${token}`
+      ),
+      fetch(
+        `https://us.wio.seeed.io/v1/node/GroveAirqualityA0/quality?access_token=${token}`
+      )
+    ])
 
-    const humidity = await fetch(
-      `https://us.wio.seeed.io/v1/node/GroveTempHumD0/humidity?access_token=${token}`
+    const data = (
+      await Promise.all([tempRes.json(), humidityRes.json(), qualityRes.json()])
+    ).reduce(
+      (item, data) => ({
+        ...data,
+        ...item
+      }),
+      {}
     )
-    const hum = await humidity.json()
 
-    const airQuality = await fetch(
-      `https://us.wio.seeed.io/v1/node/GroveAirqualityA0/quality?access_token=${token}`
-    )
-    const aq = await airQuality.json()
-
-    return setData({ temp, hum, aq })
+    return setData(data)
   }
 
   let intervalId = useRef()
   useEffect(() => {
     intervalId.current = setInterval(() => {
-      //assign interval to a variaable to clear it
       fetchData()
-    }, 180000)
+    }, 5000)
 
     return () => {
       clearInterval(intervalId.current)
@@ -66,93 +77,65 @@ export default function Home({ temp, hum, aq, token }) {
   const airQuality = backgroundColorForQuality()
 
   return (
-    <Grid
-      sx={{
-        flexGrow: 1,
-        position: 'fixed',
-        top: '0',
-        right: '0',
-        bottom: '0',
-        left: '0',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '1rem',
-        backgroundColor: '#d7f7f4'
-      }}
-      container
-      spacing={4}
-    >
-      <Grid key={1} item>
-        <h2 style={{ textAlign: 'center' }}> Temperature </h2>
-        <Paper
-          sx={{
-            height: 340,
-            width: 300,
-            justifyContent: 'center',
-            alignItems: 'center',
-            display: 'flex',
-            flexWrap: 'wrap',
-            zIndex: '-1',
-            backgroundColor: 'rgb(44, 106, 213, 0.1)'
-          }}
-        >
-          <p style={{ fontSize: '75px' }}>{data.temp.celsius_degree} ° </p>
-        </Paper>
-      </Grid>
-      <Grid key={2} item>
-        <h2 style={{ textAlign: 'center' }}> Air quality </h2>
-        <Paper
-          sx={{
-            height: 340,
-            width: 300,
-            justifyContent: 'center',
-            alignItems: 'center',
-            display: 'flex',
-            flexWrap: 'wrap',
-            backgroundColor: airQuality.color 
-          }}
-        >
-          <p style={{ fontSize: '45px' }}>{airQuality.value} </p>
-        </Paper>
-      </Grid>
-      <Grid key={3} item>
-        <h2 style={{ textAlign: 'center' }}> Air humidity </h2>
-        <Paper
-          sx={{
-            height: 340,
-            width: 300,
-            justifyContent: 'center',
-            alignItems: 'center',
-            display: 'flex',
-            flexWrap: 'wrap',
-            backgroundColor: 'rgb(44, 106, 213, 0.1)'
-          }}
-        >
-          <p style={{ fontSize: '75px' }}>{data.hum.humidity} % </p>
-        </Paper>
-      </Grid>
-    </Grid>
+    <div className="summary">
+      <div className="grid">
+        <div id="temperature" className="sensor-item">
+          <div className="heading">
+            <Image className="svg-icon" src={temperatureImg} />
+            <span className='svg-text'> Temperature </span>
+          </div>
+          <div>
+            <span className="value">{data.celsius_degree}</span>
+            <span className="unit">℃</span>
+          </div>
+        </div>
+        <div id="humidity" className="sensor-item">
+          <div className="heading">
+            <Image className="svg-icon" src={humidityImg} /> 
+            <span className='svg-text'> Humidity </span>
+          </div>
+          <div>
+            <span className="value">{data.humidity}</span>
+            <span className="unit">%</span>
+          </div>
+        </div>
+        <div id="quality" className="sensor-item">
+          <div className="heading">
+            <Image className="svg-icon" src={qualityImg} /> 
+            <span className='svg-text'>CO2</span>
+          </div>
+          <div>
+            <span className="valueTemp" style={{color: airQuality.color}}>{airQuality.value}</span>
+          </div>
+        </div>
+      </div>
+    </div>
   )
 }
 
 export async function getServerSideProps() {
   const token = process.env.ACCESS_TOKEN
-  // Fetch data from external API
-  const temperature = await fetch(
-    `https://us.wio.seeed.io/v1/node/GroveTempHumD0/temperature?access_token=${token}`
-  )
-  const temp = await temperature.json()
+  const [tempRes, humidityRes, qualityRes] = await Promise.all([
+    fetch(
+      `https://us.wio.seeed.io/v1/node/GroveTempHumD0/temperature?access_token=${token}`
+    ),
+    fetch(
+      `https://us.wio.seeed.io/v1/node/GroveTempHumD0/humidity?access_token=${token}`
+    ),
+    fetch(
+      `https://us.wio.seeed.io/v1/node/GroveAirqualityA0/quality?access_token=${token}`
+    )
+  ])
 
-  const humidity = await fetch(
-    `https://us.wio.seeed.io/v1/node/GroveTempHumD0/humidity?access_token=${token}`
+  const data = (
+    await Promise.all([tempRes.json(), humidityRes.json(), qualityRes.json()])
+  ).reduce(
+    (item, data) => ({
+      ...data,
+      ...item
+    }),
+    {}
   )
-  const hum = await humidity.json()
 
-  const airQuality = await fetch(
-    `https://us.wio.seeed.io/v1/node/GroveAirqualityA0/quality?access_token=${token}`
-  )
-  const aq = await airQuality.json()
-
-  return { props: { temp, hum, aq, token } }
+  return { props: { data, token } }
 }

@@ -2,8 +2,74 @@ html,
 body {
   padding: 0;
   margin: 0;
+  background-color: #0a1a1b;
+  color: #e0e0e0;
+  font-size: 20px;
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+}
+
+body {
+  margin-top: 1rem;
+}
+
+h1 {
+  font-family: "Unica One", sans-serif;
+}
+
+.align.center {
+  text-align: center;
+}
+
+.summary {
+  margin-top: 10rem;
+}
+
+.summary .sensor-item {
+  text-align: center;
+  margin: 100px;
+}
+
+.summary .sensor-item .heading {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.summary .sensor-item .heading i.icon {
+  color: #e0e0e0;
+}
+
+.summary .value {
+  line-height: 100%;
+  font-size: 120px;
+  font-family: "Lato", sans-serif;
+  font-weight: 100;
+}
+
+.summary .valueTemp {
+  line-height: 100%;
+  font-size: 120px;
+  font-family: "Lato", sans-serif;
+  font-weight: 100;
+}
+
+
+@media (max-width: 500px) {
+  .summary .valueTemp {
+    font-size: 40px;
+  }
+}
+
+.svg-icon {
+  width: 102px;
+  height: 102px;
+  vertical-align: middle;
+  margin-right: 0.2rem;
+  opacity: 0.5;
+}
+
+.svg-text {
+  vertical-align: super;
+  margin: 10px;
 }
 
 a {
