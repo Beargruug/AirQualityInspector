@@ -16,7 +16,7 @@ export default function Home({
     let quality = data?.quality
     let value
 
-    if (quality > 120) {
+    if (quality > 100) {
       // red high pollution
       r = 255
       g = Math.floor(255 * (50 - (quality % 50) - 50))
@@ -102,10 +102,11 @@ export default function Home({
         <div id="quality" className="sensor-item">
           <div className="heading">
             <Image className="svg-icon" src={qualityImg} /> 
-            <span className='svg-text'>CO2</span>
+            <span className='svg-text' style={{color: airQuality.color}}>CO2 - {airQuality.value}</span>
           </div>
           <div>
-            <span className="valueTemp" style={{color: airQuality.color}}>{airQuality.value}</span>
+            <span className="value">{data.quality * 10}</span>
+            <span className="unit">ppm</span>
           </div>
         </div>
       </div>
