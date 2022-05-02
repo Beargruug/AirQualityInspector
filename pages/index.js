@@ -67,7 +67,7 @@ export default function Home({
   useEffect(() => {
     intervalId.current = setInterval(() => {
       fetchData()
-    }, 5000)
+    }, 180000)
 
     return () => {
       clearInterval(intervalId.current)
