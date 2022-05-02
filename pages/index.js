@@ -16,7 +16,7 @@ export default function Home({
     let quality = data?.quality
     let value
 
-    if (quality > 100) {
+    if (quality > 120) {
       // red high pollution
       r = 255
       g = Math.floor(255 * (50 - (quality % 50) - 50))
