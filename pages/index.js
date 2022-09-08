@@ -16,7 +16,12 @@ export default function Home({
     let quality = data?.quality
     let value
 
-    if (quality > 100) {
+    if (!quality) {
+      // red
+      r = 255
+      g = Math.floor(0)
+      value = 'No Connection'
+    } else if (quality > 100) {
       // red high pollution
       r = 255
       g = Math.floor(255 * (50 - (quality % 50) - 50))
@@ -41,17 +46,21 @@ export default function Home({
     const [tempRes, humidityRes, qualityRes] = await Promise.all([
       fetch(
         `https://us.wio.seeed.io/v1/node/GroveTempHumD0/temperature?access_token=${token}`
-      ),
+      ).catch(e => console.log(e)),
       fetch(
         `https://us.wio.seeed.io/v1/node/GroveTempHumD0/humidity?access_token=${token}`
-      ),
+      ).catch(e => console.log(e)),
       fetch(
         `https://us.wio.seeed.io/v1/node/GroveAirqualityA0/quality?access_token=${token}`
-      )
+      ).catch(e => console.log(e))
     ])
 
     const data = (
-      await Promise.all([tempRes.json(), humidityRes.json(), qualityRes.json()])
+      await Promise.all([
+        tempRes?.json(),
+        humidityRes?.json(),
+        qualityRes?.json()
+      ])
     ).reduce(
       (item, data) => ({
         ...data,
@@ -81,28 +90,30 @@ export default function Home({
       <div className="grid">
         <div id="temperature" className="sensor-item">
           <div className="heading">
-            <Image className="svg-icon" src={temperatureImg} />
-            <span className='svg-text'> Temperature </span>
+            <Image alt="temp" className="svg-icon" src={temperatureImg} />
+            <span className="svg-text"> Temperature </span>
           </div>
           <div>
-            <span className="value">{data.celsius_degree}</span>
+            <span className="value">{data.celsius_degree * 1}</span>
             <span className="unit">℃</span>
           </div>
         </div>
         <div id="humidity" className="sensor-item">
           <div className="heading">
-            <Image className="svg-icon" src={humidityImg} /> 
-            <span className='svg-text'> Humidity </span>
+            <Image alt="humidity" className="svg-icon" src={humidityImg} />
+            <span className="svg-text"> Humidity </span>
           </div>
           <div>
-            <span className="value">{data.humidity}</span>
+            <span className="value">{data.humidity * 1}</span>
             <span className="unit">%</span>
           </div>
         </div>
         <div id="quality" className="sensor-item">
           <div className="heading">
-            <Image className="svg-icon" src={qualityImg} /> 
-            <span className='svg-text' style={{color: airQuality.color}}>CO2 - {airQuality.value}</span>
+            <Image alt="quality" className="svg-icon" src={qualityImg} />
+            <span className="svg-text" style={{ color: airQuality.color }}>
+              CO2 - {airQuality.value}
+            </span>
           </div>
           <div>
             <span className="value">{data.quality * 10}</span>
@@ -119,17 +130,21 @@ export async function getServerSideProps() {
   const [tempRes, humidityRes, qualityRes] = await Promise.all([
     fetch(
       `https://us.wio.seeed.io/v1/node/GroveTempHumD0/temperature?access_token=${token}`
-    ),
+    ).catch(e => console.log(e)),
     fetch(
       `https://us.wio.seeed.io/v1/node/GroveTempHumD0/humidity?access_token=${token}`
-    ),
+    ).catch(e => console.log(e)),
     fetch(
       `https://us.wio.seeed.io/v1/node/GroveAirqualityA0/quality?access_token=${token}`
-    )
+    ).catch(e => console.log(e))
   ])
 
   const data = (
-    await Promise.all([tempRes.json(), humidityRes.json(), qualityRes.json()])
+    await Promise.all([
+      tempRes?.json(),
+      humidityRes?.json(),
+      qualityRes?.json()
+    ])
   ).reduce(
     (item, data) => ({
       ...data,
