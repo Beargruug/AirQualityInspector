@@ -10,7 +10,6 @@ export default function Home({
   token
 }) {
   const [data, setData] = useState({ quality, humidity, celsius_degree })
-  console.log('data:', data)
 
   const backgroundColorForQuality = () => {
     let r, g, b
