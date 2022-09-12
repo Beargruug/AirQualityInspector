@@ -10,18 +10,14 @@ export default function Home({
   token
 }) {
   const [data, setData] = useState({ quality, humidity, celsius_degree })
+  console.log('data:', data)
 
   const backgroundColorForQuality = () => {
     let r, g, b
     let quality = data?.quality
     let value
 
-    if (!quality) {
-      // red
-      r = 255
-      g = Math.floor(0)
-      value = 'No Connection'
-    } else if (quality > 100) {
+    if (quality > 100) {
       // red high pollution
       r = 255
       g = Math.floor(255 * (50 - (quality % 50) - 50))
