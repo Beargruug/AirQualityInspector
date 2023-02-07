@@ -21,7 +21,7 @@ export default function Home({
       r = 255
       g = Math.floor(255 * (50 - (quality % 50) - 50))
       value = 'High Pollution'
-    } else if (quality < 68) {
+    } else if (quality < 40) {
       // red to yellow low pollution
       r = 255
       g = Math.floor(255 * ((50 - (quality % 50)) / 50))
