@@ -120,7 +120,7 @@ export default function Home({
   )
 }
 
-export async function getServerSideProps() {
+export async function getStaticProps() {
   const token = process.env.ACCESS_TOKEN
   const [tempRes, humidityRes, qualityRes] = await Promise.all([
     fetch(
