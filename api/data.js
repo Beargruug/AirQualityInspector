@@ -17,11 +17,11 @@ export default async function handler(req, res) {
       qualityRes.json()
     ]);
 
-    res.status(200).json({
+    return {
       temperature: tempData,
       humidity: humidityData,
       quality: qualityData
-    });
+    };
   } catch (error) {
     console.error("Failed to load data", error);
     res.status(500).json({ error: "Error while reading data" });
