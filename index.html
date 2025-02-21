@@ -76,15 +76,23 @@
     </div>
 
     <script>
+        const token = process.env.ACCESS_TOKEN;
+
         async function fetchData() {
             try {
-                const response = await fetch('/api/data');
-                const data = await response.json();
-                updateUI(
-                    data.temperature.celsius_degree,
-                    data.humidity.humidity,
-                    data.quality.quality
-                );
+                const [tempRes, humidityRes, qualityRes] = await Promise.all([
+                    fetch(`https://cn.wio.seeed.io/v1/node/GroveTempHumD0/temperature?access_token=${token}`),
+                    fetch(`https://cn.wio.seeed.io/v1/node/GroveTempHumD0/humidity?access_token=${token}`),
+                    fetch(`https://cn.wio.seeed.io/v1/node/GroveAirqualityA0/quality?access_token=${token}`)
+                ]);
+
+                const [tempData, humidityData, qualityData] = await Promise.all([
+                    tempRes.json(),
+                    humidityRes.json(),
+                    qualityRes.json()
+                ]);
+
+                updateUI(tempData.celsius_degree, humidityData.humidity, qualityData.quality);
             } catch (error) {
                 console.error("Error fetching data:", error);
             }
