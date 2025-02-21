@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <style>
+        body {
+            background-color: #63a6a2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(1, 1fr);
+            margin: 0 auto;
+            width: 50%;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .sensor-item {
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            justify-content: center;
+        }
+
+        .heading {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .value {
+            font-size: 2em;
+            font-weight: bold;
+        }
+
+        .unit {
+            font-size: 1em;
+            color: #666;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="summary">
+        <div id="temperature" class="sensor-item">
+            <div class="heading">Temperature</div>
+            <div>
+                <span class="value" id="temp-value">--</span>
+                <span class="unit">℃</span>
+            </div>
+        </div>
+        <div id="humidity" class="sensor-item">
+            <div class="heading">Humidity</div>
+            <div>
+                <span class="value" id="humidity-value">--</span>
+                <span class="unit">%</span>
+            </div>
+        </div>
+        <div id="quality" class="sensor-item">
+            <div class="heading">Air Quality</div>
+            <div>
+                <span class="value" id="quality-value">--</span>
+                <span class="unit">ppm</span>
+            </div>
+            <div id="quality-status" style="margin-top: 10px; font-weight: bold;"></div>
+        </div>
+    </div>
+
+    <script>
+        async function fetchData() {
+            try {
+                const response = await fetch('/api/data');
+                const data = await response.json();
+                updateUI(
+                    data.temperature.celsius_degree,
+                    data.humidity.humidity,
+                    data.quality.quality
+                );
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
+        }
+
+        function updateUI(temperature, humidity, quality) {
+            document.getElementById("temp-value").textContent = temperature || "--";
+            document.getElementById("humidity-value").textContent = humidity || "--";
+            document.getElementById("quality-value").textContent = quality * 10 || "--";
+
+            const qualityStatus = calculateAirQuality(quality);
+            document.getElementById("quality-value").style.color = qualityStatus.color;
+
+            document.getElementById("quality-status").textContent = qualityStatus.value;
+            document.getElementById("quality-status").style.color = qualityStatus.color;
+        }
+
+        function calculateAirQuality(quality) {
+            let r, g, b, value;
+            if (quality > 100) {
+                r = 255;
+                g = Math.floor(255 * (50 - (quality % 50) - 50));
+                value = "High Pollution";
+            } else if (quality < 33) {
+                r = 255;
+                g = Math.floor(255 * ((50 - (quality % 50)) / 50));
+                value = "Low Pollution";
+            } else {
+                r = Math.floor(255 * ((quality % 50) / 50));
+                g = 255;
+                value = "Fresh Air";
+            }
+            b = 0;
+            return {color: `rgb(${r}, ${g}, ${b})`, value};
+        }
+
+        setInterval(fetchData, 180000);
+        fetchData();
+    </script>
+</body>
+
+</html>
