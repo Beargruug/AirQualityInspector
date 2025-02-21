@@ -93,7 +93,7 @@
         function updateUI(temperature, humidity, quality) {
             document.getElementById("temp-value").textContent = temperature || "--";
             document.getElementById("humidity-value").textContent = humidity || "--";
-            document.getElementById("quality-value").textContent = quality * 10 || "--";
+            document.getElementById("quality-value").textContent = quality || "--";
 
             const qualityStatus = calculateAirQuality(quality);
             document.getElementById("quality-value").style.color = qualityStatus.color;
@@ -108,7 +108,7 @@
                 r = 255;
                 g = Math.floor(255 * (50 - (quality % 50) - 50));
                 value = "High Pollution";
-            } else if (quality < 33) {
+            } else if (quality > 33) {
                 r = 255;
                 g = Math.floor(255 * ((50 - (quality % 50)) / 50));
                 value = "Low Pollution";
